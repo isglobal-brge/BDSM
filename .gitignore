@@ -37,3 +37,12 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+*.o
+*.Rproj
+*.old
+Read-and-delete-me
+*.so
+src/include/.DS_Store
+.DS_Store
+*.originals
+*.hdf5
