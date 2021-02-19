@@ -43,7 +43,7 @@ blockmult_hdf5 <- function( filename, group, a, b, block_size = 128, paral = FAL
                        outgroup = "OUTPUT")
 { 
 
-  res <- .Call('_BigDataStatMeth_blockmult_hdf5', PACKAGE = 'BigDataStatMeth', filename, group, a, b, block_size, paral, threads, mixblock_size, outgroup)
+  res <- .Call('_BDSM_blockmult_hdf5', PACKAGE = 'BDSM', filename, group, a, b, block_size, paral, threads, mixblock_size, outgroup)
 
   if (res$result == 0)
     #..# return( list("res" = rhdf5::H5Fopen(res$filename), "file" = res$filename, "dataset" = res$dataset) )
