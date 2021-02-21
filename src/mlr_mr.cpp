@@ -12,7 +12,8 @@ Eigen::MatrixXd Rcpp_mlr_mr(Eigen::MatrixXd x, Eigen::MatrixXd y, int iblocks, R
   
   int chunk = 1, tid;
   unsigned int ithreads;
-  int irows =  x.rows(), icols = x.cols();
+  int irows =  x.rows(), 
+      icols = x.cols();
   
   // Get number of threads
   if(threads.isNotNull()) 
@@ -32,7 +33,6 @@ Eigen::MatrixXd Rcpp_mlr_mr(Eigen::MatrixXd x, Eigen::MatrixXd y, int iblocks, R
   Eigen::MatrixXd Q1( irows, icols );
   Eigen::VectorXd indexQ1( iblocks+1 );
   
-  
 #pragma omp parallel shared( R1, Q1, indexQ1, chunk) 
   {
     // First steps --> (1) Read block
@@ -41,6 +41,7 @@ Eigen::MatrixXd Rcpp_mlr_mr(Eigen::MatrixXd x, Eigen::MatrixXd y, int iblocks, R
     double block_size = std::floor((double)irows/(double)iblocks);
     int maxsizetoread = block_size;
     int iSizetoRead; 
+
     
 #pragma omp parallel for ordered schedule(dynamic)
     for( int i = 0; i<iblocks ; i++) 
@@ -69,6 +70,7 @@ Eigen::MatrixXd Rcpp_mlr_mr(Eigen::MatrixXd x, Eigen::MatrixXd y, int iblocks, R
   
     }
   } 
+
    
   // QR decomposition from R1
   strQR decR1;
@@ -83,8 +85,9 @@ Eigen::MatrixXd Rcpp_mlr_mr(Eigen::MatrixXd x, Eigen::MatrixXd y, int iblocks, R
   int maxsizetoread = block_size;
   int iSizetoRead; 
   int startnext = 0;
+
   
-#pragma omp parallel for ordered schedule(dynamic)
+#pragma omp parallel for ordered schedule(dynamic) 
   for( int i = 0; i< iblocks ; i++) 
   {
     
@@ -99,18 +102,21 @@ Eigen::MatrixXd Rcpp_mlr_mr(Eigen::MatrixXd x, Eigen::MatrixXd y, int iblocks, R
 
     // Get block from Q2    
     Q2BlockDiv = GetCurrentBlock( decR1.Q, i*block_size, 0, iSizetoRead, decR1.Q.cols());
-    
+
     // Get block from Q1
     Q1BlockDiv = GetCurrentBlock( Q1, indexQ1(i), 0, ((indexQ1(i+1)) - indexQ1(i)), Q1.cols());
 
     // Get Q3 and V
     Q3 = Bblock_matrix_mul_parallel(Q1BlockDiv, Q2BlockDiv, 256, threads);
+    
     Eigen::MatrixXd YBlock  = GetCurrentBlock( y, indexQ1(i), 0, Q3.rows(), 1);
+    
     V.block(0, i, V.rows(), 1) = Bblock_matrix_mul_parallel( Q3.adjoint(), YBlock , 256, threads );
-
+    
     startnext = startnext + Q3.adjoint().cols();
 
   }
+
 
   // Get Betas
   Eigen::MatrixXd beta = Bblock_matrix_mul_parallel( decR1.R.inverse(), V.rowwise().sum(), 256, threads);
@@ -160,9 +166,9 @@ Rcpp::RObject bdMLR_MR(Rcpp::RObject X, Rcpp::RObject y, int blocks, Rcpp::Nulla
       }
       catch(std::exception &ex) { }
     }
-    
+
     Eigen::MatrixXd beta = Rcpp_mlr_mr(eX, eY, blocks, threads);
-    
+
     return (wrap(beta));
     
   } catch (std::exception &ex) {
