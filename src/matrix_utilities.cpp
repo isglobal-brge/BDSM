@@ -140,6 +140,7 @@ Rcpp::RObject Normalize_Data ( Rcpp::RObject & x,
   bool bc, bs;
   CharacterVector svrows, svrcols;
   
+  
   List dimnames = x.attr( "dimnames" );
   
   if(dimnames.size()>0 ) {
@@ -179,6 +180,11 @@ Rcpp::RObject Normalize_Data ( Rcpp::RObject & x,
     
     Eigen::RowVectorXd mean = X.colwise().mean();
     Eigen::RowVectorXd std = ((X.rowwise() - mean).array().square().colwise().sum() / (X.rows() - 1)).sqrt();
+    
+    // Replace 0 to 0.00000000001 to avoid errors
+    std = (std.array() = 0).select(0.00000000001, std);
+    
+    // Scale data
     X = (X.rowwise() - mean).array().rowwise() / std.array();
     
   }   else if (bc == true)   {
@@ -190,6 +196,11 @@ Rcpp::RObject Normalize_Data ( Rcpp::RObject & x,
     
     Eigen::RowVectorXd mean = X.colwise().mean();
     Eigen::RowVectorXd std = (X.array().square().colwise().sum() / (X.rows() - 1)).sqrt();
+    
+    // Replace 0 to 0.00000000001 to avoid errors
+    std = (std.array() = 0).select(0.00000000001, std);
+    
+    // Scale data
     X = X.array().rowwise() / std.array();
   } 
 
