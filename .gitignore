@@ -21,8 +21,8 @@
 .Rproj.user/
 
 # produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+# vignettes/*.html
+# vignettes/*.pdf
 
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
@@ -46,3 +46,4 @@ src/include/.DS_Store
 .DS_Store
 *.originals
 *.hdf5
+vignettes/looe.html

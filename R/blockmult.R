@@ -37,7 +37,7 @@
 #' blockmult( AD, BD, 128, TRUE)
 #' 
 blockmult <- function( a, b, block_size = 128, paral = TRUE, threads = NULL, bigmatrix = 10000, mixblock_size = 128, 
-                       outfile = "./tmp_blockmult.hdf5", onmemory = FALSE)
+                       outfile = "results.hdf5", onmemory = FALSE)
 { 
 
   res <- .Call('_BDSM_blockmult', PACKAGE = 'BDSM', a, b, block_size, paral, threads, bigmatrix, mixblock_size, outfile, onmemory)
@@ -45,6 +45,6 @@ blockmult <- function( a, b, block_size = 128, paral = TRUE, threads = NULL, big
   if (res$filename == '')
     return (res$matrix)
   else
-    return( list("dataset" = rhdf5::H5Fopen(res$dataset), "file" = res$filename) )
+    return( list( "file" = res$filename, "dataset" = res$dataset) )
 
 }
