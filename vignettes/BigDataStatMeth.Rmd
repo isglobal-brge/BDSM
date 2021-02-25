@@ -176,7 +176,7 @@ h5fdelay
 The \$ operator can be used to access the next group level, this operator reads the object from disk. We can assign the dataset contents to an R object in order to work with it.
 
 ```{r hdf5Dataset}
-Adata = h5fdelay$OMICS$data
+Adata <- h5fdelay$OMICS$data
 Adata[1:3,1:6]
 ```
 
@@ -189,8 +189,8 @@ After work with hdf5 we always must close the file. We can close only one file w
 H5Fclose(h5fdelay)
 
 # Open 2 files and close all
-h5fdelay = H5Fopen("delayed.hdf5")
-h5fr = H5Fopen("robjects.hdf5")
+h5fdelay <- H5Fopen("delayed.hdf5")
+h5fr <- H5Fopen("robjects.hdf5")
 
 h5closeAll()
 ```
