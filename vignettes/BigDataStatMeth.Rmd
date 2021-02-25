@@ -1,10 +1,9 @@
 ---
-title: "Algebra and Statistical Methods for Big Data with Bioconductor"
+title: "Algebra and Statistical Methods for Big Data"
 author: 
 - name: Dolors Pelegri
   affiliation: 
-  - &uvic Universitat de Vic - Universitat Central de Catalunya (UVic)
-  - &isglobal ISGlobal, Centre for Research in Environmental Epidemiology (CREAL)
+  - &isglobal Barcelona Institute for Global Health (ISGlobal)
   - &brge Bioinformatics Research Group in Epidemiolgy (BRGE)
 - name: Juan R. Gonzalez
   affiliation: 
@@ -12,13 +11,13 @@ author:
   - *brge
   email: juanr.gonzalez@isglobal.org
 date: "`r Sys.Date()`"
-package: "`r pkg_ver('BigDataStatMeth')`"
+package: "`r pkg_ver('BDSM')`"
 output:
   BiocStyle::html_document: default
   BiocStyle::pdf_document:
     toc_float: true
 abstract: |
-  Description of functions to perform matrix operations, algebra and some statistical models using _DelayedMatrix_ objects and HDF5 data files.
+  Description of functions to perform matrix operations, algebra and some statistical methods using HDF5 data files and _DelayedMatrix_ objects.
 vignette: |
   %\VignetteIndexEntry{Algebra and Statistical Methods for Big Data with Bioconductor}
   %\VignetteEncoding{UTF-8}
@@ -50,26 +49,36 @@ options(width = 180)
 -->
 # Prerequisites
 
-The package requires other `Bioconductor` packages to be installed. These include: `beachmat`, `HDF5Array`,
-`DelayedArray`, `rhdf5`. Other required R packages are: `Matrix`,
-`RcppEigen` and `RSpectra`. 
+The package requires some R packages that can be installed by
+
+```{r eval=FALSE}
+install.packages("Matrix", "RcppEigen", "RSpectra", "DT")
+```
+
+and some [Bioconductor](https://bioconductor.org/) ones:
+
+```{r eval=FALSE}
+BiocManager::install(c("beachmat", "HDF5Array", "DelayedArray", "rhdf5"))
+```
+
+
 
 # Overview
 
-This package implements seveal matrix operations using `DelayMatrix` objects and HDF5 data files as well as some basic algebra operations that can be used to carry out some statistical analyses using standard methodologies such as principal component analyses or least squares estimation. The package also contains specific statatistical method mainly used in `omic` data analysis such as lasso regression. 
+This package implements several matrix operations using HDF5 data files and `DelayedMatrix` objects. `BDSM` also contains functions to perform some basic algebra operations that can be used to carry out some statistical analyses using standard methodologies such as principal component analyses or least squares estimation. The package also contains specific statistical method mainly used in `omic` data analysis such as lasso regression. 
 
 # Getting started
 
 First, let us start by loading the required packages to describe the main capabilities of the package
 
 ```{r, load}
-library(BigDataStatMeth)
+library(BDSM)
 library(DelayedArray)
 library(rhdf5)
 library(DT)
 ```
 
-These other packages are required to reproduce this vignette
+This package is also required to reproduce this vignette
 
 ```{r, load2}
 library(microbenchmark)
@@ -187,6 +196,16 @@ h5closeAll()
 ```
 
 More information about working with hdf5 files in r [@rhdf5]
+
+## `DelayedMatrix`
+
+A `DelayedMatrix` is a type of `DelayedArray` which is like an ordinary array in R, but allows for the data to be in-memory, on-disk in a file, or even hosted on a remote server.
+
+The [DelayedArray framework](https://bioconductor.org/packages/3.12/bioc/vignettes/DelayedArray/inst/doc/02-Implementing_a_backend.html) supports some on-disk backends for genomic data. We can deal with HDF5 files via rhdf5 and the HDF5Array package, GenomicDataStorage (GDS) via the gdsfmt and GDSArray package, and Variant Calling Format (VCF) files via the VCFArray package. However, this can be extended to support other on-disk backends. In theory, it should be possible to implement a DelayedArray backend for any file format that has the capability to store array data with fast random access.
+
+Having data in such format allows to perform very fast operations for a given matrix. This has been implemented in the [DelayedMatrixStats](https://bioconductor.org/packages/release/bioc/vignettes/DelayedMatrixStats/inst/doc/DelayedMatrixStatsOverview.html) package. Several examples of how to deal with `DelayedArray` can be found in [this workshop](http://biocworkshops2019.bioconductor.org.s3-website-us-east-1.amazonaws.com/page/DelayedArrayWorkshop__Effectively_using_the_DelayedArray_framework_for_users/).
+
+
 
 # Matrix Multiplication
 
@@ -626,13 +645,13 @@ SVD decomposition with normalized data and different parameters executed in memm
 
 ```{r svdperform, cache=TRUE}
 bdSVD_hdf5_Normal_k2q1 <- 
-  "bdSVD_hdf5('delayed.hdf5',group='OMICS',dataset='data')"
+  "bdSVD_hdf5('delayed.hdf5', group='OMICS',dataset='data')"
 bdSVD_hdf5_Normal_k4q1 <- 
-  "bdSVD_hdf5('delayed.hdf5',group='OMICS',dataset='data',k=4)"
+  "bdSVD_hdf5('delayed.hdf5', group='OMICS',dataset='data',k=4)"
 bdSVD_hdf5_Normal_k4q2 <- 
   "bdSVD_hdf5('delayed.hdf5',group='OMICS',dataset='data',q=2,k=4)"
-bdSVD_memory_Normal <- 'bdSVD_lapack(omdata)'
-svd_R_memory_Normal <- 'svd(scale(omdata))'
+bdSVD_memory_Normal <- "bdSVD_lapack(omdata)"
+svd_R_memory_Normal <- "svd(scale(omdata))"
 
 # With normalization process
 # res <- microbenchmark( eval(parse(text=bdSVD_hdf5_Normal_k2q1)),
