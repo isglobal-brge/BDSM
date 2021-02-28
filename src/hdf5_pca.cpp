@@ -146,6 +146,11 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
       ::Rf_error( "c++ exception (Dataset does not exist !)" );
     }
     
+    /*** 
+    IMPORTANT !!! 
+      DO IT AGANIN !!! (Optimized)
+    
+    
     // Real data set dimension
     dims_out = get_HDF5_dataset_size(*v);
     count[0] = dims_out[0];
@@ -167,7 +172,7 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
     write_HDF5_matrix_ptr(file, strlocpcadataset+"/var.cos2", wrap(tmp.pow(2) ));
     
     // Quality Variable var.qual
-
+  ***/
     
   }catch( FileIException error ) {
     ::Rf_error( "c++ exception (File IException )" );
@@ -181,7 +186,7 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
   } 
   
   d->close();
-  v->close();
+  // v->close();
 
   return(0);
 }
