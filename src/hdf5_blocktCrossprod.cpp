@@ -124,7 +124,28 @@ int hdf5_block_matrix_tcrossprod_hdf5( std::string matA, IntegerVector sizeA,
 //' @param threads (optional) only if bparal = true, number of concurrent threads in parallelization if threads is null then threads =  maximum number of threads available
 //' @param outgroup (optional) group name to store results from Crossprod inside hdf5 data file
 //' @examples
-//'   a = "See vignette"
+//' 
+//' matA <- matA <- matrix(c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15), nrow = 3, byrow = TRUE)
+//' matB <- matrix(c(15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,5,3,4,5,2,6,2,3,4, 42, 23, 23, 423,1,2), ncol = 5, byrow = TRUE)
+//' 
+//' Create_HDF5_matrix_file("BasicMatVect.hdf5", matA, "INPUT", "matA")
+//' Create_HDF5_matrix( matB, "BasicMatVect.hdf5", "INPUT", "matB")
+//' 
+//' res <- BDSM::tCrossprod_hdf5("BasicMatVect.hdf5", "INPUT","matA", block_size = 2)
+//' res2 <- BDSM::tCrossprod_hdf5("BasicMatVect.hdf5", "INPUT", "matA", "INPUT","matB", block_size = 2)
+//' 
+//' # Open file
+//' h5fdelay = H5Fopen("BasicMatVect.hdf5")
+//' 
+//' res <- h5fdelay$OUTPUT$tCrossProd_matAxmatA
+//' res2 <- h5fdelay$OUTPUT$tCrossProd_matAxmatB
+//' 
+//' all.equal(tcrossprod(matA), res)
+//' all.equal(tcrossprod(matA, matB), res2)
+//' 
+//' # Close delayed.hdf5 file
+//' H5Fclose(h5fdelay)
+//' 
 //' @export
 // [[Rcpp::export]]
 Rcpp::RObject tCrossprod_hdf5(std::string filename, const std::string group, 
@@ -308,8 +329,8 @@ dim(matB)
 Create_HDF5_matrix_file("BasicMatVect.hdf5", matA, "INPUT", "matA")
 Create_HDF5_matrix( matB, "BasicMatVect.hdf5", "INPUT", "matB")
 
-res <- BDSM::blocktCrossprod_hdf5("BasicMatVect.hdf5", "INPUT","matA", block_size = 2)
-res2 <- BDSM::blocktCrossprod_hdf5("BasicMatVect.hdf5", "INPUT", "matA", "INPUT","matB", block_size = 2)
+res <- BDSM::tCrossprod_hdf5("BasicMatVect.hdf5", "INPUT","matA", block_size = 2)
+res2 <- BDSM::tCrossprod_hdf5("BasicMatVect.hdf5", "INPUT", "matA", "INPUT","matB", block_size = 2)
 
 
 
@@ -322,18 +343,9 @@ h5fdelay = H5Fopen("BasicMatVect.hdf5")
 h5fdelay
 
 res <- h5fdelay$OUTPUT$tCrossProd_matAxmatA
-res
-tcrossprod(matA)
-
-
 res2 <- h5fdelay$OUTPUT$tCrossProd_matAxmatB
-t(res2)
-res2
-tcrossprod(matA,matB)
-
 
 all.equal(tcrossprod(matA), res)
-all.equal(tcrossprod(matA, matB), t(res2))
 all.equal(tcrossprod(matA, matB), res2)
 
 # Close delayed.hdf5 file
