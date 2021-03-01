@@ -30,10 +30,41 @@ bdRemovelowdata <- function(filename, group, dataset, outgroup, outdataset, pcen
 #' @param threads (optional) only if bparal = true, number of concurrent threads in parallelization if threads is null then threads =  maximum number of threads available
 #' @param outgroup (optional) group name to store results from Crossprod inside hdf5 data file
 #' @examples
-#'   a = "See vignette"
+#'   
+#'   library(BDSM)
+#'   library(rhdf5)
+#'      
+#'   matA <- matA <- matrix(c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15), nrow = 3, byrow = TRUE)
+#'   matB <- matrix(c(14,23,13,12,12,10,9,8,30,6,5,4,37,2,1), nrow = 3, byrow = TRUE)
+#'   
+#'   Create_HDF5_matrix_file("BasicMatVect.hdf5", matA, "INPUT", "matA")
+#'   Create_HDF5_matrix(matB, "BasicMatVect.hdf5", "INPUT", "matB")
+#'   
+#'   Crossprod_hdf5("BasicMatVect.hdf5", "INPUT","matA", block_size = 2)
+#'   Crossprod_hdf5("BasicMatVect.hdf5", "INPUT","matA", "INPUT","matB", block_size = 2)
+#'   
+#'   # Examine hierarchy before open file
+#'   h5ls("BasicMatVect.hdf5")
+#'   
+#'   # Open file
+#'   h5fdelay = H5Fopen("BasicMatVect.hdf5")
+#'   
+#'   # Show hdf5 hierarchy (groups)
+#'   h5fdelay
+#'   
+#'   res <- h5fdelay$OUTPUT$CrossProd_matAxmatA
+#'   res2 <- h5fdelay$OUTPUT$CrossProd_matAxmatB
+#'   
+#'   all.equal(crossprod(matA), res)
+#'   all.equal(crossprod(matA,matB), res2)
+#'   
+#'   # Close delayed.hdf5 file
+#'   H5Fclose(h5fdelay)
+#'   
+#'   
 #' @export
-blockCrossprod_hdf5 <- function(filename, group, A, block_size = NULL, paral = NULL, threads = NULL, mixblock_size = NULL, outgroup = NULL) {
-    .Call('_BDSM_blockCrossprod_hdf5', PACKAGE = 'BDSM', filename, group, A, block_size, paral, threads, mixblock_size, outgroup)
+Crossprod_hdf5 <- function(filename, group, A, groupB = NULL, B = NULL, block_size = NULL, paral = NULL, threads = NULL, mixblock_size = NULL, outgroup = NULL) {
+    .Call('_BDSM_Crossprod_hdf5', PACKAGE = 'BDSM', filename, group, A, groupB, B, block_size, paral, threads, mixblock_size, outgroup)
 }
 
 #' Multiply hdf5 matrix
@@ -68,8 +99,8 @@ blockmult_hdf5 <- function(filename, group, A, B, block_size = NULL, paral = NUL
 #' @examples
 #'   a = "See vignette"
 #' @export
-blocktCrossprod_hdf5 <- function(filename, group, A, block_size = NULL, paral = NULL, threads = NULL, mixblock_size = NULL, outgroup = NULL) {
-    .Call('_BDSM_blocktCrossprod_hdf5', PACKAGE = 'BDSM', filename, group, A, block_size, paral, threads, mixblock_size, outgroup)
+tCrossprod_hdf5 <- function(filename, group, A, groupB = NULL, B = NULL, block_size = NULL, paral = NULL, threads = NULL, mixblock_size = NULL, outgroup = NULL) {
+    .Call('_BDSM_tCrossprod_hdf5', PACKAGE = 'BDSM', filename, group, A, groupB, B, block_size, paral, threads, mixblock_size, outgroup)
 }
 
 #' Impute SNPs in hdf5 omic dataset 

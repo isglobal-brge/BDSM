@@ -23,21 +23,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// blockCrossprod_hdf5
-Rcpp::RObject blockCrossprod_hdf5(std::string filename, const std::string group, std::string A, Rcpp::Nullable<int> block_size, Rcpp::Nullable<bool> paral, Rcpp::Nullable<int> threads, Rcpp::Nullable<double> mixblock_size, Rcpp::Nullable<std::string> outgroup);
-RcppExport SEXP _BDSM_blockCrossprod_hdf5(SEXP filenameSEXP, SEXP groupSEXP, SEXP ASEXP, SEXP block_sizeSEXP, SEXP paralSEXP, SEXP threadsSEXP, SEXP mixblock_sizeSEXP, SEXP outgroupSEXP) {
+// Crossprod_hdf5
+Rcpp::RObject Crossprod_hdf5(std::string filename, const std::string group, std::string A, Rcpp::Nullable<std::string> groupB, Rcpp::Nullable<std::string> B, Rcpp::Nullable<int> block_size, Rcpp::Nullable<bool> paral, Rcpp::Nullable<int> threads, Rcpp::Nullable<double> mixblock_size, Rcpp::Nullable<std::string> outgroup);
+RcppExport SEXP _BDSM_Crossprod_hdf5(SEXP filenameSEXP, SEXP groupSEXP, SEXP ASEXP, SEXP groupBSEXP, SEXP BSEXP, SEXP block_sizeSEXP, SEXP paralSEXP, SEXP threadsSEXP, SEXP mixblock_sizeSEXP, SEXP outgroupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
     Rcpp::traits::input_parameter< const std::string >::type group(groupSEXP);
     Rcpp::traits::input_parameter< std::string >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type groupB(groupBSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type B(BSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<int> >::type block_size(block_sizeSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<bool> >::type paral(paralSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<int> >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type mixblock_size(mixblock_sizeSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type outgroup(outgroupSEXP);
-    rcpp_result_gen = Rcpp::wrap(blockCrossprod_hdf5(filename, group, A, block_size, paral, threads, mixblock_size, outgroup));
+    rcpp_result_gen = Rcpp::wrap(Crossprod_hdf5(filename, group, A, groupB, B, block_size, paral, threads, mixblock_size, outgroup));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -60,21 +62,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// blocktCrossprod_hdf5
-Rcpp::RObject blocktCrossprod_hdf5(std::string filename, const std::string group, std::string A, Rcpp::Nullable<int> block_size, Rcpp::Nullable<bool> paral, Rcpp::Nullable<int> threads, Rcpp::Nullable<double> mixblock_size, Rcpp::Nullable<std::string> outgroup);
-RcppExport SEXP _BDSM_blocktCrossprod_hdf5(SEXP filenameSEXP, SEXP groupSEXP, SEXP ASEXP, SEXP block_sizeSEXP, SEXP paralSEXP, SEXP threadsSEXP, SEXP mixblock_sizeSEXP, SEXP outgroupSEXP) {
+// tCrossprod_hdf5
+Rcpp::RObject tCrossprod_hdf5(std::string filename, const std::string group, std::string A, Rcpp::Nullable<std::string> groupB, Rcpp::Nullable<std::string> B, Rcpp::Nullable<int> block_size, Rcpp::Nullable<bool> paral, Rcpp::Nullable<int> threads, Rcpp::Nullable<double> mixblock_size, Rcpp::Nullable<std::string> outgroup);
+RcppExport SEXP _BDSM_tCrossprod_hdf5(SEXP filenameSEXP, SEXP groupSEXP, SEXP ASEXP, SEXP groupBSEXP, SEXP BSEXP, SEXP block_sizeSEXP, SEXP paralSEXP, SEXP threadsSEXP, SEXP mixblock_sizeSEXP, SEXP outgroupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string >::type filename(filenameSEXP);
     Rcpp::traits::input_parameter< const std::string >::type group(groupSEXP);
     Rcpp::traits::input_parameter< std::string >::type A(ASEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type groupB(groupBSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type B(BSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<int> >::type block_size(block_sizeSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<bool> >::type paral(paralSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<int> >::type threads(threadsSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type mixblock_size(mixblock_sizeSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<std::string> >::type outgroup(outgroupSEXP);
-    rcpp_result_gen = Rcpp::wrap(blocktCrossprod_hdf5(filename, group, A, block_size, paral, threads, mixblock_size, outgroup));
+    rcpp_result_gen = Rcpp::wrap(tCrossprod_hdf5(filename, group, A, groupB, B, block_size, paral, threads, mixblock_size, outgroup));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -559,9 +563,9 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BDSM_bdRemovelowdata", (DL_FUNC) &_BDSM_bdRemovelowdata, 7},
-    {"_BDSM_blockCrossprod_hdf5", (DL_FUNC) &_BDSM_blockCrossprod_hdf5, 8},
+    {"_BDSM_Crossprod_hdf5", (DL_FUNC) &_BDSM_Crossprod_hdf5, 10},
     {"_BDSM_blockmult_hdf5", (DL_FUNC) &_BDSM_blockmult_hdf5, 9},
-    {"_BDSM_blocktCrossprod_hdf5", (DL_FUNC) &_BDSM_blocktCrossprod_hdf5, 8},
+    {"_BDSM_tCrossprod_hdf5", (DL_FUNC) &_BDSM_tCrossprod_hdf5, 10},
     {"_BDSM_bdImputeSNPHDF5", (DL_FUNC) &_BDSM_bdImputeSNPHDF5, 6},
     {"_BDSM_Normalize_hdf5", (DL_FUNC) &_BDSM_Normalize_hdf5, 6},
     {"_BDSM_bdPCA_hdf5", (DL_FUNC) &_BDSM_bdPCA_hdf5, 6},

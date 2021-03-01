@@ -12,7 +12,7 @@ blockmult(
   threads = NULL,
   bigmatrix = 10000,
   mixblock_size = 128,
-  outfile = "./tmp_blockmult.hdf5",
+  outfile = "results.hdf5",
   onmemory = FALSE
 )
 
@@ -24,7 +24,7 @@ blockmult(
   threads = NULL,
   bigmatrix = 10000,
   mixblock_size = 128,
-  outfile = "./tmp_blockmult.hdf5",
+  outfile = "results.hdf5",
   onmemory = FALSE
 )
 }
