@@ -186,7 +186,7 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
   } 
   
   d->close();
-  // v->close();
+  v->close();
 
   return(0);
 }
