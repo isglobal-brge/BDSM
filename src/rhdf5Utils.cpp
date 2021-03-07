@@ -1318,7 +1318,7 @@ extern "C" {
   
   
   // Create dataset from stringVector
-  int write_hdf5_string_vector2(H5File* file, std::string datasetname, StringVector DatasetValues)
+  int write_hdf5_string_vector(H5File* file, std::string datasetname, StringVector DatasetValues)
   {
     
     DataSet* unlimDataset;
@@ -1466,88 +1466,6 @@ extern "C" {
   
   
   
-  // Create dataset from stringVector
-  int write_hdf5_string_vector(H5File* file, std::string datasetname, StringVector DatasetValues)
-  {
-
-    try
-    {
-      // Turn off the auto-printing when failure occurs so that we can handle the errors appropriately
-      Exception::dontPrint();
-      
-      // Open file
-      //..// DataSet dataset = file->openDataSet(datasetname);
-      
-      // Create the data space for the dataset.
-      hsize_t vectorsize;
-      
-      if (is<StringVector>(DatasetValues))
-      {
-        vectorsize = DatasetValues.length();
-        
-        hsize_t dims[] = {vectorsize};
-        DataSpace dataspace(RANK1, dims);
-        
-        typedef struct name {
-          char chr[MAXSTRING];
-        } name;
-        
-        int datarows = as<StringVector>(DatasetValues).size();
-        
-        // Convert Dataframe to range list
-        name names_list[datarows]; 
-        
-        for(int i=0; i< datarows; i++ )
-        {
-          //..// name n;
-          String wchrom = as<StringVector>(DatasetValues)(i);
-          std::string word = wchrom.get_cstring();
-          
-          int j=0;
-          for( j=0; j < word.size() && j < (MAXSTRING-1); j++ )
-            names_list[i].chr[j] = word[j];
-          
-          names_list[i].chr[j] = '\0'; // insert hdf5 end of string
-          
-        }
-        
-        // Create the memory datatype.
-        H5::CompType mtype(sizeof(name));
-        mtype.insertMember("chr", HOFFSET(name, chr), H5::StrType(H5::PredType::C_S1, MAXSTRING ));
-
-        // Create the dataset.
-        DataSet* dataset;
-        dataset = new DataSet(file->createDataSet(datasetname, mtype, dataspace));
-        
-        dataset->write(names_list, mtype);
-
-        // Release resources
-        delete dataset;
-        
-        
-        
-      }
-      
-    } 
-    catch(FileIException error) { // catch failure caused by the H5File operations
-      ::Rf_error( "c++ exception (File IException)" );
-      return -1;
-    } catch(DataSetIException error) { // catch failure caused by the DataSet operations
-      ::Rf_error( "c++ exception (DataSet IException)" );
-      return -1;
-    } catch(GroupIException error) { // catch failure caused by the Group operations
-      ::Rf_error( "c++ exception (Group IException)" );
-      return -1;
-    } catch(DataSpaceIException error) { // catch failure caused by the DataSpace operations
-      ::Rf_error( "c++ exception (DataSpace IException)" );
-      return -1;
-    }
-    
-    return 0;
-    
-  }
-  
-
 
   
   // Write dimnames from Matrix RObjects to hdf5 data file 
@@ -1572,7 +1490,7 @@ extern "C" {
       
       // Add colnames
       if( colnames.length()>1 )
-        write_hdf5_string_vector2(file, strGroup + "/2", colnames);
+        write_hdf5_string_vector(file, strGroup + "/2", colnames);
       else
         Rcpp::Rcout<<"Warning no colnames to save";
       
@@ -1979,7 +1897,11 @@ Rcpp::RObject Create_HDF5_matrix_file(std::string filename, RObject mat,
       svrows = dimnames[1];
       svrcols = dimnames[0];
 
-      write_hdf5_matrix_dimnames(file, strsubgroup, strdataset, svrows, svrcols );
+      if(transposed == false){
+        write_hdf5_matrix_dimnames(file, strsubgroup, strdataset, svrows, svrcols );
+      }else{
+        write_hdf5_matrix_dimnames(file, strsubgroup, strdataset, svrcols, svrows );
+      }
       
     }
 

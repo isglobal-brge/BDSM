@@ -125,6 +125,7 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
     
     create_HDF5_groups_ptr(file, strlocpcadataset );
     
+    Rcpp::Rcout<<"\nGetting Lambda\n";
     Eigen::VectorXd data = GetCurrentBlock_hdf5(file, d, 0, 0, count[0], count[1]);
     Eigen::VectorXd vvar = data.array().pow(2);
     
@@ -132,9 +133,11 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
     write_HDF5_matrix_ptr(file, strlocpcadataset+"/lambda", wrap(vvar));
     
     // Write variance dataset
+    Rcpp::Rcout<<"\nGetting Variance\n";
     vvar = vvar/vvar.sum();
     write_HDF5_matrix_ptr(file, strlocpcadataset+"/var", wrap(vvar));
     
+    Rcpp::Rcout<<"\nGetting Cumulative Variance\n";
     // Write cumulative variance dataset
     write_HDF5_matrix_ptr(file, strlocpcadataset+"/cumvar", wrap(cumsum_hdf5(vvar)));
     
@@ -260,8 +263,6 @@ Rcpp::RObject bdPCA_hdf5(std::string filename, std::string group, std::string da
     // Gets variance related variables
     //. Works ok but obsolete.//get_HDF5_PCA_variance_ptr(file, dataset);
     
-    
-    Rcpp::Rcout<<"\n Ara anem a la funció ?? !! \n";
     // Gets var.contr, C, var.coord and var.cos^2 
     get_HDF5_PCA_variables_ptr(file, dataset);
       
