@@ -17,7 +17,7 @@
   #include "tgmath.h"
 
 
-  #define MAXSVDBLOCK 5120
+  #define MAXSVDBLOCK 10
 
   // dgesvd_ is a symbol in the LAPACK-BLAS Level 3 
   //    DGESVD computes the singular value decomposition (SVD) of a real M-by-N matrix A, 
@@ -30,6 +30,8 @@
   svdeig RcppbdSVD_lapack( Eigen::MatrixXd& X,  bool bcenter, bool bscale );
   svdeig RcppbdSVD_hdf5( std::string filename, std::string strsubgroup, std::string strdataset,  
                          int k, int q, int nev, bool bcenter, bool bscale, Rcpp::Nullable<int> ithreads  );
+  svdeig RcppbdSVD_hdf5_ptr( H5File* file, std::string strsubgroup, std::string strdataset,  
+                             int k, int q, int nev, bool bcenter, bool bscale, Rcpp::Nullable<int> ithreads);
   svdeig RcppbdSVD_hdf5_Block( H5File* file, DataSet* dataset, int k, int q, int nev, bool bcenter, bool bscale, 
                                int irows, int icols, Rcpp::Nullable<int> threads);
   

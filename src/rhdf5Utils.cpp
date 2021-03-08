@@ -1020,6 +1020,7 @@ extern "C" {
   
   int write_HDF5_matrix_from_R_ptr(H5File* file, const std::string CDatasetName, RObject DatasetValues, bool transposed)
   {
+    
     try
     {
       // Turn off the auto-printing when failure occurs so that we can handle the errors appropriately
@@ -1059,6 +1060,7 @@ extern "C" {
       } 
       else if( Rcpp::is<IntegerMatrix>(DatasetValues) ) 
       {
+        
         hsize_t dims[2];
         if(transposed == true){
           dims[0] = as<IntegerMatrix>(DatasetValues).rows();
@@ -1124,7 +1126,9 @@ extern "C" {
           dataset.close();
         } 
         
-      } 
+      } else {
+        Rcpp::Rcout<<"\n\n Unknown data type - Dataset not created !!\n";
+      }
       
     } catch(FileIException error) { // catch failure caused by the H5File operations
       ::Rf_error( "c++ exception (File IException)" );
@@ -1839,12 +1843,14 @@ Rcpp::RObject Create_HDF5_matrix_file(std::string filename, RObject mat,
   try
   {
 
+
     std::string strsubgroup, strdataset;
     bool transposed;
     
     if(group.isNull())  strsubgroup = "INPUT" ;
     else    strsubgroup = Rcpp::as<std::string>(group);
     
+
     if(dataset.isNull())  strdataset = "A" ;
     else    strdataset = Rcpp::as<std::string>(dataset);
     

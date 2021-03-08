@@ -278,6 +278,7 @@ svdeig RcppbdSVD_hdf5( std::string filename, std::string strsubgroup, std::strin
   Eigen::MatrixXd X;
   // int nconv;
 
+  
   // Open an existing file and dataset.
   H5File file(filename, H5F_ACC_RDWR);
   DataSet dataset;
@@ -290,6 +291,7 @@ svdeig RcppbdSVD_hdf5( std::string filename, std::string strsubgroup, std::strin
     throw std::range_error("Dataset not exits"); 
   }
 
+  
   // Get dataset dims
   IntegerVector dims_out = get_HDF5_dataset_size(dataset);
 
@@ -297,6 +299,7 @@ svdeig RcppbdSVD_hdf5( std::string filename, std::string strsubgroup, std::strin
   //..// hsize_t count[2] = {as<hsize_t>(dims_out[0]), as<hsize_t>(dims_out[1])};
   hsize_t count[2] = { (unsigned long long)dims_out[0], (unsigned long long)dims_out[1]};
 
+  
   // In memory computation for small matrices (rows or columns<5000)
   // Block decomposition for big mattrix
   if( std::max(dims_out[0], dims_out[1]) < MAXSVDBLOCK )
@@ -306,13 +309,16 @@ svdeig RcppbdSVD_hdf5( std::string filename, std::string strsubgroup, std::strin
     X.transposeInPlace();
 
     retsvd = RcppbdSVD(X, k, nev, bcenter, bscale);
-
+    
+    
+  
   }
   else{
 
     // data stored transposed in hdf5
     int xdim = (unsigned long long)dims_out[1];
     int ydim = (unsigned long long)dims_out[0];
+    
     
     // Remove previous results
     if(exists_HDF5_element_ptr(&file,"SVD/"+strdataset))
@@ -322,11 +328,91 @@ svdeig RcppbdSVD_hdf5( std::string filename, std::string strsubgroup, std::strin
     }
       
     retsvd = RcppbdSVD_hdf5_Block( &file, &dataset, k, q, nev, bcenter, bscale, xdim, ydim, wrap(ithreads));
+    
+    
   }
   
 
   return retsvd;
    
+}
+
+
+
+
+
+
+
+// SVD decomposition with hdf5 file
+//    input data : hdf5 file (object from crossproduct matrix) datagroup = 'strsubgroupIN'
+//    output data : hdf5 file svd data in datagroup svd 
+//                        svd/d 
+//                        svd/u 
+//                        svd/v 
+//                        
+//  https://github.com/isglobal-brge/svdParallel/blob/8b072f79c4b7c44a3f1ca5bb5cba4d0fceb93d5b/R/generalBlockSVD.R
+//  @param k number of local SVDs to concatenate at each level 
+//  @param q number of levels
+//  
+svdeig RcppbdSVD_hdf5_ptr( H5File* file, std::string strsubgroup, std::string strdataset,  
+                       int k, int q, int nev, bool bcenter, bool bscale, Rcpp::Nullable<int> ithreads = R_NilValue )
+{
+  
+  svdeig retsvd;
+  Eigen::MatrixXd X;
+  // int nconv;
+  
+  // Open an existing file and dataset.
+  // H5File file(filename, H5F_ACC_RDWR);
+  DataSet dataset;
+  
+  if(exists_HDF5_element_ptr(file, strsubgroup + "/" + strdataset)){
+    dataset = file->openDataSet(strsubgroup + "/" + strdataset);
+
+  }
+  else {
+    file->close();
+    throw std::range_error("Dataset not exits"); 
+  }
+  
+  // Get dataset dims
+  IntegerVector dims_out = get_HDF5_dataset_size(dataset);
+  
+  hsize_t offset[2] = {0,0};
+  //..// hsize_t count[2] = {as<hsize_t>(dims_out[0]), as<hsize_t>(dims_out[1])};
+  hsize_t count[2] = { (unsigned long long)dims_out[0], (unsigned long long)dims_out[1]};
+  
+  // In memory computation for small matrices (rows or columns<5000)
+  // Block decomposition for big mattrix
+  if( std::max(dims_out[0], dims_out[1]) < MAXSVDBLOCK )
+  {
+
+    X = GetCurrentBlock_hdf5( file, &dataset, offset[0], offset[1], count[0], count[1]);
+    X.transposeInPlace();
+
+    retsvd = RcppbdSVD(X, k, nev, bcenter, bscale);
+
+  }
+  else{
+    
+    // data stored transposed in hdf5
+    int xdim = (unsigned long long)dims_out[1];
+    int ydim = (unsigned long long)dims_out[0];
+    
+    // Remove previous results
+    if(exists_HDF5_element_ptr(file,"SVD/"+strdataset))
+    {
+      //..// Rcpp::Rcout<<"\n Old DATASET have been removed \n";
+      remove_HDF5_element_ptr(file,"SVD/"+strdataset);
+    }
+    
+    retsvd = RcppbdSVD_hdf5_Block( file, &dataset, k, q, nev, bcenter, bscale, xdim, ydim, wrap(ithreads));
+    
+   }
+  
+  
+  return retsvd;
+  
 }
 
 

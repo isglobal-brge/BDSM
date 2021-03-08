@@ -41,9 +41,10 @@ int get_HDF5_PCA_variance_ptr(  H5File* file, std::string strdataset)
     }else{
       //.Remove note.// throw("Dataset does not exist !");
       // stop("Dataset does not exist !");
+      file->close();
       ::Rf_error( "c++ exception (Dataset does not exist !)" );
     }
-    
+
     // Real data set dimension
     IntegerVector dims_out = get_HDF5_dataset_size(*dataset);
     count[0] = dims_out[0];
@@ -107,14 +108,16 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
     
     std::string strlocpcadataset = "PCA/" + strdataset;
     
+    
     if( exists_HDF5_element_ptr(file, strSVDdataset_d ) ){
       d = new DataSet(file->openDataSet(strSVDdataset_d));
     }else{
       //.Remove note.// throw("Dataset does not exist !");
       // stop("Dataset does not exist !");
+      file->close();
       ::Rf_error( "c++ exception (Dataset does not exist !)" );
     }
-    
+
     // Real data set dimension
     IntegerVector dims_out = get_HDF5_dataset_size(*d);
     count[0] = dims_out[0];
@@ -141,14 +144,16 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
     // Write cumulative variance dataset
     write_HDF5_matrix_ptr(file, strlocpcadataset+"/cumvar", wrap(cumsum_hdf5(vvar)));
     
+    
     if( exists_HDF5_element_ptr(file, strSVDdataset_v ) ){
       v = new DataSet(file->openDataSet(strSVDdataset_v));
     }else{
       //.Remove note.// throw("Dataset does not exist !");
       // stop("Dataset does not exist !");
+      file->close();
       ::Rf_error( "c++ exception (Dataset does not exist !)" );
     }
-    
+
     /*** 
     IMPORTANT !!! 
       DO IT AGANIN !!! (Optimized)
@@ -257,7 +262,7 @@ Rcpp::RObject bdPCA_hdf5(std::string filename, std::string group, std::string da
       else    ithreads = std::thread::hardware_concurrency() - 1; //omp_get_max_threads(); 
       */
       //..// svdeig retsvd = RcppbdSVD_hdf5( filename, group, dataset, 4, 1, 0, true, true, ithreads );
-      svdeig retsvd = RcppbdSVD_hdf5( filename, group, dataset, ks, qs, nvs, bcent, bscal, threads );
+      svdeig retsvd = RcppbdSVD_hdf5_ptr( file, group, dataset, ks, qs, nvs, bcent, bscal, threads );
     }
     
     // Gets variance related variables

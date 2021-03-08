@@ -24,7 +24,7 @@
   const int	DIM2 = 2;
   const int	DIM3 = 3;
   const int	MAXSTRING = 20;
-  const hsize_t MAXSTRBLOCK = 150000;
+  const hsize_t MAXSTRBLOCK = 100000;
   
   // a typedef for our managed H5File pointer
   typedef std::shared_ptr<H5::H5File> H5FilePtr;
@@ -81,7 +81,6 @@
                                              RObject DatasetValues);
   
   extern "C" int write_hdf5_string_vector(H5File* file, std::string datasetname, StringVector DatasetValues);
-  extern "C" int write_hdf5_string_vector2(H5File* file, std::string datasetname, StringVector DatasetValues);
   //..// extern "C" StringVector get_hdf5_matrix_dimnames(H5File* file, std::string datasetname, int idim );
   StringVector get_hdf5_matrix_dimnames(H5File* file, std::string groupname, std::string datasetname, int idim );
   //..// extern "C" int write_hdf5_matrix_dimnames(H5File* file, std::string datasetname, StringVector rownames, StringVector colnames);
