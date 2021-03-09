@@ -142,7 +142,10 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
     
     Rcpp::Rcout<<"\nGetting Cumulative Variance\n";
     // Write cumulative variance dataset
-    write_HDF5_matrix_ptr(file, strlocpcadataset+"/cumvar", wrap(cumsum_hdf5(vvar)));
+    int ielements = 0;
+    if(vvar.size()>1000){  ielements = 1000;    }
+    else{ ielements = vvar.size();    }
+    write_HDF5_matrix_ptr(file, strlocpcadataset+"/cumvar", wrap(cumsum_hdf5(vvar.head(ielements))));
     
     
     if( exists_HDF5_element_ptr(file, strSVDdataset_v ) ){
