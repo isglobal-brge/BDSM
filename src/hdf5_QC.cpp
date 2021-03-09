@@ -39,116 +39,138 @@ int Remove_snp_low_data_HDF5( H5File* file, DataSet* dataset, bool bycols, std::
   int itotrem = 0;
   
   
-  
-  // Real data set dimension
-  IntegerVector dims_out = get_HDF5_dataset_size(*dataset);
-  
-  // id bycols == true : read all rows by group of columns ; else : all columns by group of rows
-  if (bycols == true) {
-    ilimit = dims_out[0];
-    count[1] = dims_out[1];
-    offset[1] = 0;
-  } else {
-    ilimit = dims_out[1];
-    count[0] = dims_out[0];
-    offset[0] = 0;
-  };
-  
-  
-  for( int i=0; i<=(ilimit/blocksize); i++) 
-  {
-    int iread;
-    int iblockrem = 0;
+  try{
     
-    if( (i+1)*blocksize < ilimit) iread = blocksize;
-    else iread = ilimit - (i*blocksize);
+    // Real data set dimension
+    IntegerVector dims_out = get_HDF5_dataset_size(*dataset);
     
-    if(bycols == true) {
-      count[0] = iread; 
-      offset[0] = i*blocksize;
+    // id bycols == true : read all rows by group of columns ; else : all columns by group of rows
+    if (bycols == true) {
+      ilimit = dims_out[0];
+      count[1] = dims_out[1];
+      offset[1] = 0;
     } else {
-      count[1] = iread; 
-      offset[1] = i*blocksize;
-    }
+      ilimit = dims_out[1];
+      count[0] = dims_out[0];
+      offset[0] = 0;
+    };
     
-    // read block
-    Eigen::MatrixXd data = GetCurrentBlock_hdf5(file, dataset, offset[0], offset[1], count[0], count[1]);
-    
-    if(bycols == true) // We have to do it by rows
+    for( int i=0; i<=(ilimit/blocksize); i++) 
     {
-      //.commented 20201120 - warning check().// int actualrow = 0;
-      int readedrows = data.rows();
-      //..// for( int row = 0; row<readedrows; row++)  // COMPLETE EXECUTION
-      for( int row = readedrows-1 ; row>=0; row--)  // COMPLETE EXECUTION
+      int iread;
+      int iblockrem = 0;
+      
+      if( (i+1)*blocksize < ilimit) iread = blocksize;
+      else iread = ilimit - (i*blocksize);
+      
+      if(bycols == true) {
+        count[0] = iread; 
+        offset[0] = i*blocksize;
+      } else {
+        count[1] = iread; 
+        offset[1] = i*blocksize;
+      }
+
+      // read block
+      Eigen::MatrixXd data = GetCurrentBlock_hdf5(file, dataset, offset[0], offset[1], count[0], count[1]);
+      
+      if(bycols == true) // We have to do it by rows
       {
+        //.commented 20201120 - warning check().// int actualrow = 0;
+        int readedrows = data.rows();
+        //..// for( int row = 0; row<readedrows; row++)  // COMPLETE EXECUTION
+        for( int row = readedrows-1 ; row>=0; row--)  // COMPLETE EXECUTION
+        {
           if((data.row(row).array() == 3).count()/(double)count[1]>= pcent )
           {
             removeRow(data, row);
             iblockrem = iblockrem + 1;
           } 
-      }
-    } else {
-      
-      //.commented 20201120 - warning check().// int actualcol = 0;
-      int readedcols = data.cols();
-      
-      //..//for( int col = 0; col<data.cols(); col++) 
-      for( int col = readedcols-1 ; col>=0; col--)  // COMPLETE EXECUTION
-      { 
-        
-        if((data.col(col).array() == 3).count()/(double)count[1]> pcent )
-        {
-          removeRow(data, col);
-          iblockrem = iblockrem + 1;
-        } 
-        
-        /***
-        std::map<double, double> mapSNP;
-        mapSNP = VectortoOrderedMap_SNP_counts(data. col(col));
-        auto it = mapSNP.find(3);
-        
-        if(!(it == mapSNP.end()))
-        {
-          if( ( (double)it->second /(double)count[1] ) >pcent )
-          {
-            removeColumn(data, i-iblockrem);
-            iblockrem = iblockrem + 1;
-          }
         }
-         ***/
+      } else {
+        
+        //.commented 20201120 - warning check().// int actualcol = 0;
+        int readedcols = data.cols();
+        
+        //..//for( int col = 0; col<data.cols(); col++) 
+        for( int col = readedcols-1 ; col>=0; col--)  // COMPLETE EXECUTION
+        { 
+          
+          if((data.col(col).array() == 3).count()/(double)count[1]> pcent )
+          {
+            removeRow(data, col);
+            iblockrem = iblockrem + 1;
+          } 
+          
+          /***
+           std::map<double, double> mapSNP;
+           mapSNP = VectortoOrderedMap_SNP_counts(data. col(col));
+           auto it = mapSNP.find(3);
+           
+           if(!(it == mapSNP.end()))
+           {
+           if( ( (double)it->second /(double)count[1] ) >pcent )
+           {
+           removeColumn(data, i-iblockrem);
+           iblockrem = iblockrem + 1;
+           }
+           }
+           ***/
+        }
       }
-    }
-    
-    int extendcols = data.cols();
-    int extendrows = data.rows();
-    
-
-    if(i==0) {
-      create_HDF5_unlimited_matrix_dataset_ptr(file, stroutdata, extendrows, extendcols, "numeric");
-      unlimDataset = new DataSet(file->openDataSet(stroutdata));
-    }else {
-      if(bycols == true)
-        extend_HDF5_matrix_subset_ptr(file, unlimDataset, extendrows, 0);
-      else
-        extend_HDF5_matrix_subset_ptr(file, unlimDataset, 0, extendcols);
-    }
-    
-    IntegerVector countblock = IntegerVector::create(extendrows, extendcols);
-    
-    write_HDF5_matrix_subset_v2(file, unlimDataset, newoffset, countblock, stride, block, wrap(data) );
-    
-    if(bycols == true)
-      newoffset[0] =  newoffset[0] + extendrows;
-    else
-      newoffset[1] =  newoffset[2] + extendcols;
       
+      int extendcols = data.cols();
+      int extendrows = data.rows();
+      
+      if(i==0) {
+        create_HDF5_unlimited_matrix_dataset_ptr(file, stroutdata, extendrows, extendcols, "numeric");
+        unlimDataset = new DataSet(file->openDataSet(stroutdata));
+      }else {
+        if(bycols == true){
+          extend_HDF5_matrix_subset_ptr(file, unlimDataset, extendrows, 0);
+        }else{
+          extend_HDF5_matrix_subset_ptr(file, unlimDataset, 0, extendcols);
+        }
+      }
+      
+      IntegerVector countblock = IntegerVector::create(extendrows, extendcols);
+      write_HDF5_matrix_subset_v2(file, unlimDataset, newoffset, countblock, stride, block, wrap(data) );
+
+      if(bycols == true)
+        newoffset[0] =  newoffset[0] + extendrows;
+      else
+        newoffset[1] =  newoffset[1] + extendcols;
+      
+      
+      itotrem = itotrem - iblockrem;
+      
+    }
     
-    itotrem = itotrem - iblockrem;
-    
+    unlimDataset->close();
+
+  } catch(FileIException error) { // catch failure caused by the H5File operations
+    unlimDataset->close();
+    ::Rf_error( "c++ exception (File IException)" );
+    return -1;
+  } catch(DataSetIException error) { // catch failure caused by the DataSet operations
+    unlimDataset->close();
+    ::Rf_error( "c++ exception (DataSet IException)" );
+    return -1;
+  } catch(GroupIException error) { // catch failure caused by the Group operations
+    unlimDataset->close();
+    ::Rf_error( "c++ exception (Group IException)" );
+    return -1;
+  } catch(DataSpaceIException error) { // catch failure caused by the DataSpace operations
+    unlimDataset->close();
+    ::Rf_error( "c++ exception (DataSpace IException)" );
+    return -1;
+  } catch(DataTypeIException error) { // catch failure caused by the DataSpace operations
+    unlimDataset->close();
+    ::Rf_error( "c++ exception (Data TypeIException)" );
+    return -1;
   }
   
-  unlimDataset->close();
-  
+    
   return(itotrem);
 }
 
@@ -205,9 +227,10 @@ Rcpp::RObject bdRemovelowdata( std::string filename, std::string group, std::str
     }
     
     file = new H5File( filename, H5F_ACC_RDWR );
-
+    
     if(exists_HDF5_element_ptr(file, strdataset)) 
     {
+      
       DataSet* pdataset; //.moved from declaration variables 20201120 - warning check().//
       
       pdataset = new DataSet(file->openDataSet(strdataset));
@@ -222,7 +245,7 @@ Rcpp::RObject bdRemovelowdata( std::string filename, std::string group, std::str
         // Create group if not exists
         if(!exists_HDF5_element_ptr(file, outgroup))
           file->createGroup(outgroup);
-
+        
       } else {
         throw std::range_error("Input and output dataset must be different");  
       }
