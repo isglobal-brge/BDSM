@@ -182,11 +182,10 @@ Rcpp::RObject bdRemovelowdata( std::string filename, std::string group, std::str
   {
     bool bcols;
     double dpcent;
-    
+
     std::string stroutdata = outgroup +"/" + outdataset;
     std::string strdataset = group +"/" + dataset;
-    
-    
+
     if(SNPincols.isNull()){  
       bcols = true ;
     }else{    
@@ -199,13 +198,14 @@ Rcpp::RObject bdRemovelowdata( std::string filename, std::string group, std::str
       dpcent = Rcpp::as<double>(pcent);
     }
     
-    if(!ResFileExist(filename)){
-      throw std::range_error("File not exits, create file before impute dataset");
+
+    //..//if(!ResFileExist(filename))
+    if(!ResFileExist_filestream(filename)){
+      throw std::range_error("File not exits, create file before access to dataset");
     }
     
     file = new H5File( filename, H5F_ACC_RDWR );
 
-    
     if(exists_HDF5_element_ptr(file, strdataset)) 
     {
       DataSet* pdataset; //.moved from declaration variables 20201120 - warning check().//
@@ -214,7 +214,7 @@ Rcpp::RObject bdRemovelowdata( std::string filename, std::string group, std::str
       
       if( strdataset.compare(stroutdata)!= 0)
       {
-        Rcpp::Rcout<<"\n Input and output datasets will be different \n";
+        
         // If output is different from imput --> Remve possible existing dataset and create new
         if(exists_HDF5_element_ptr(file, stroutdata))
           remove_HDF5_element_ptr(file, stroutdata);
@@ -226,7 +226,7 @@ Rcpp::RObject bdRemovelowdata( std::string filename, std::string group, std::str
       } else {
         throw std::range_error("Input and output dataset must be different");  
       }
-      
+
       iremoved = Remove_snp_low_data_HDF5( file, pdataset, bcols, stroutdata, dpcent);
       
       Function warning("warning");

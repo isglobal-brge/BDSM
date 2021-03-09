@@ -9,6 +9,7 @@
   #include "ReadDelayedData.h"
   #include "hdf5_to_Eigen.h"
   #include <boost/algorithm/string.hpp>
+  #include <fstream>
 
   // [[Rcpp::depends(RcppEigen)]]
 
@@ -30,6 +31,7 @@
   typedef std::shared_ptr<H5::H5File> H5FilePtr;
 
   bool ResFileExist(const std::string& name);
+  bool ResFileExist_filestream(std::string name);
   bool RemoveFile(std::string filename);
   
   //..// extern "C" StringVector get_dataset_names_from_group( H5File* file, std::string strgroup);

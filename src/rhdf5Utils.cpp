@@ -11,6 +11,23 @@ bool ResFileExist(const std::string& name) {
   
   struct stat buffer;   
   return (stat (name.c_str(), &buffer) == 0); 
+  
+}
+
+
+// Check if file exists
+bool ResFileExist_filestream(std::string name) {
+  
+  bool exists = true;
+  
+  fstream fileStream;
+  fileStream.open(name);
+
+  if (fileStream.fail()) {
+    exists = false;
+  }
+  
+  return(exists);
 
 }
 
