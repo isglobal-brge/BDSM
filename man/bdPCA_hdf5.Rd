@@ -4,7 +4,15 @@
 \alias{bdPCA_hdf5}
 \title{PCA Descomposition}
 \usage{
-bdPCA_hdf5(filename, group, dataset, bcenter = FALSE, bscale = FALSE, threads)
+bdPCA_hdf5(
+  filename,
+  group,
+  dataset,
+  bcenter = FALSE,
+  bscale = FALSE,
+  force = FALSE,
+  threads = NULL
+)
 }
 \arguments{
 \item{filename}{string, file name where dataset is stored}
@@ -16,6 +24,8 @@ bdPCA_hdf5(filename, group, dataset, bcenter = FALSE, bscale = FALSE, threads)
 \item{bcenter}{logical value if true data is centered to zero}
 
 \item{bscale}{logical value, if true data is scaled}
+
+\item{force}{logical value, if true, the SVD is forced to be computed although the SVD exists}
 
 \item{threads}{integer number of threads used to run PCA}
 }

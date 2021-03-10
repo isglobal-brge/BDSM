@@ -115,8 +115,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // bdPCA_hdf5
-Rcpp::RObject bdPCA_hdf5(std::string filename, std::string group, std::string dataset, Rcpp::Nullable<bool> bcenter, Rcpp::Nullable<bool> bscale, Rcpp::Nullable<int> threads);
-RcppExport SEXP _BDSM_bdPCA_hdf5(SEXP filenameSEXP, SEXP groupSEXP, SEXP datasetSEXP, SEXP bcenterSEXP, SEXP bscaleSEXP, SEXP threadsSEXP) {
+Rcpp::RObject bdPCA_hdf5(std::string filename, std::string group, std::string dataset, Rcpp::Nullable<bool> bcenter, Rcpp::Nullable<bool> bscale, Rcpp::Nullable<bool> force, Rcpp::Nullable<int> threads);
+RcppExport SEXP _BDSM_bdPCA_hdf5(SEXP filenameSEXP, SEXP groupSEXP, SEXP datasetSEXP, SEXP bcenterSEXP, SEXP bscaleSEXP, SEXP forceSEXP, SEXP threadsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -125,8 +125,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type dataset(datasetSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<bool> >::type bcenter(bcenterSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<bool> >::type bscale(bscaleSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<bool> >::type force(forceSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<int> >::type threads(threadsSEXP);
-    rcpp_result_gen = Rcpp::wrap(bdPCA_hdf5(filename, group, dataset, bcenter, bscale, threads));
+    rcpp_result_gen = Rcpp::wrap(bdPCA_hdf5(filename, group, dataset, bcenter, bscale, force, threads));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -568,7 +569,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BDSM_tCrossprod_hdf5", (DL_FUNC) &_BDSM_tCrossprod_hdf5, 10},
     {"_BDSM_bdImputeSNPHDF5", (DL_FUNC) &_BDSM_bdImputeSNPHDF5, 6},
     {"_BDSM_Normalize_hdf5", (DL_FUNC) &_BDSM_Normalize_hdf5, 6},
-    {"_BDSM_bdPCA_hdf5", (DL_FUNC) &_BDSM_bdPCA_hdf5, 6},
+    {"_BDSM_bdPCA_hdf5", (DL_FUNC) &_BDSM_bdPCA_hdf5, 7},
     {"_BDSM_Normalize_Data", (DL_FUNC) &_BDSM_Normalize_Data, 3},
     {"_BDSM_bdwXw", (DL_FUNC) &_BDSM_bdwXw, 3},
     {"_BDSM_bdMLR_MR", (DL_FUNC) &_BDSM_bdMLR_MR, 4},

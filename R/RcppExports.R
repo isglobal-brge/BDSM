@@ -167,11 +167,12 @@ Normalize_hdf5 <- function(filename, group, dataset, bcenter = NULL, bscale = NU
 #' @param dataset string dataset name with data to perform PCA
 #' @param bcenter logical value if true data is centered to zero
 #' @param bscale logical value, if true data is scaled
+#' @param force logical value, if true, the SVD is forced to be computed although the SVD exists
 #' @param threads integer number of threads used to run PCA
 #' @return original file with results in folder PCA/<datasetname>
 #' @export
-bdPCA_hdf5 <- function(filename, group, dataset, bcenter = FALSE, bscale = FALSE, threads) {
-    .Call('_BDSM_bdPCA_hdf5', PACKAGE = 'BDSM', filename, group, dataset, bcenter, bscale, threads)
+bdPCA_hdf5 <- function(filename, group, dataset, bcenter = FALSE, bscale = FALSE, force = FALSE, threads = NULL) {
+    .Call('_BDSM_bdPCA_hdf5', PACKAGE = 'BDSM', filename, group, dataset, bcenter, bscale, force, threads)
 }
 
 #' Normalize Delayed Array matrix

@@ -219,13 +219,14 @@ int get_HDF5_PCA_variables_ptr(  H5File* file, std::string strdataset)
 //' @param dataset string dataset name with data to perform PCA
 //' @param bcenter logical value if true data is centered to zero
 //' @param bscale logical value, if true data is scaled
+//' @param force logical value, if true, the SVD is forced to be computed although the SVD exists
 //' @param threads integer number of threads used to run PCA
 //' @return original file with results in folder PCA/<datasetname>
 //' @export
 // [[Rcpp::export]]
 Rcpp::RObject bdPCA_hdf5(std::string filename, std::string group, std::string dataset, 
                          Rcpp::Nullable<bool> bcenter = false, Rcpp::Nullable<bool> bscale = false, 
-                         Rcpp::Nullable<int> threads)
+                         Rcpp::Nullable<bool> force = false, Rcpp::Nullable<int> threads = R_NilValue)
 {
   
   H5File* file;
@@ -241,7 +242,8 @@ Rcpp::RObject bdPCA_hdf5(std::string filename, std::string group, std::string da
     int ks = 4, qs = 1, nvs = 0;
     
     bool bcent= as<bool>(bcenter), 
-         bscal = as<bool>(bscale);
+         bscal = as<bool>(bscale),
+         bforce = as<bool>(force);
     
     pcaeig pcaRes;
     
@@ -250,21 +252,8 @@ Rcpp::RObject bdPCA_hdf5(std::string filename, std::string group, std::string da
 
     std::string strSVDdataset = "SVD/" + dataset;
     
-    // Look up for svd decomposition in hdf5 file
-    if( !(exists_HDF5_element_ptr(file, strSVDdataset )) )
-    {
-      
-      /*
-      if(threads.isNotNull()) 
-      {
-        if (Rcpp::as<int> (threads) <= std::thread::hardware_concurrency())
-          ithreads = Rcpp::as<int> (threads);
-        else 
-          ithreads = std::thread::hardware_concurrency() - 1;
-      }
-      else    ithreads = std::thread::hardware_concurrency() - 1; //omp_get_max_threads(); 
-      */
-      //..// svdeig retsvd = RcppbdSVD_hdf5( filename, group, dataset, 4, 1, 0, true, true, ithreads );
+    // Look up for svd decomposition in hdf5 file or if we have to recompute again the SVD
+    if( !(exists_HDF5_element_ptr(file, strSVDdataset )) | bforce == true) {
       svdeig retsvd = RcppbdSVD_hdf5_ptr( file, group, dataset, ks, qs, nvs, bcent, bscal, threads );
     }
     
